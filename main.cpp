@@ -1,9 +1,6 @@
 #include <iostream>
-#include <string>
 #include <cmath>
 #include <curses.h>
-
-#include <iostream>
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -71,14 +68,6 @@ int main()
        getInput(player);
     }
 
-//  initscr();                   // Переход в curses-режим
-//  printw("Hello world!\n");    // Отображение приветствия в буфер
-//  refresh();                   // Вывод приветствия на настоящий экран
-//  nodelay(stdscr, true);
-//  //noecho();
-//  getch();                     // Ожидание нажатия какой-либо клавиши пользователем
-//  endwin();                    // Выход из curses-режима. Обязательная команда.
-
   return 0;
 }
 
@@ -131,28 +120,61 @@ void getInput(struct Player &player)
   tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
 
     switch (ch) {
-      case 65  :  {                                                                                                           //forward
+      case 65  :  {                                                                                                                //forward
           player.x_position += player.step * cos(player.point_of_view);
           player.y_position += player.step * (-sin(player.point_of_view));
           break;
           }
-      case 66  :  {                                                                                                           //back
+      case 66  :  {                                                                                                                //back
           player.x_position += (-player.step) * cos(player.point_of_view);
           player.y_position += (-player.step) * (-sin(player.point_of_view));
           break;
         }
-      case 68  :  player.point_of_view += 0.1; if (player.point_of_view >= 2 * M_PI) player.point_of_view -= 2 * M_PI; break;           //right
+      case 68  :  player.point_of_view += 0.1; if (player.point_of_view >= 2 * M_PI) player.point_of_view -= 2 * M_PI; break;      //right
       case 67  :  player.point_of_view -= 0.1; if (player.point_of_view < 0) player.point_of_view += 2 * M_PI;  break;             //left
     }
-  cout << ch << endl;
 }
 
-//void rayCast(struct Player &player)
+pair<int, int> rayCast(struct Player &player)
+{
+  double ray_step           = 10.0;
+  double delta_between_rays = player.field_of_view / projection_plane;                 //расстояние между лучами
+  double xCur_ray_pos       = player.x_position;                                       //текущая позиция луча по оси х
+  double yCur_ray_pos       = player.y_position;
+  double xStep;
+  double yStep;
+  int step;
+  int number_ray_distance = 0;
+
+  auto abs = [](double a, double b) -> double{
+      double result = a - b;
+      if (result < 0) result = -result;
+      return result;
+    };
+
+  for (double cur_ray = player.point_of_view - (player.field_of_view / 2); cur_ray <= player.point_of_view + (player.field_of_view / 2); cur_ray += delta_between_rays)
+    {
+      xStep = ray_step * cos(cur_ray);
+      yStep = ray_step * (-sin(cur_ray));
+      step = 0;
+
+      while (worldMap[static_cast<int>(yCur_ray_pos)][static_cast<int>(xCur_ray_pos)] != 1 && step != view_deep)
+        {
+          xCur_ray_pos += xStep;
+          yCur_ray_pos += yStep;
+          ++step;
+        }
+      distance_projection_plane[number_ray_distance] = sqrt(abs(xCur_ray_pos, player.x_position) + abs(yCur_ray_pos, player.y_position));
+      ++number_ray_distance;
+    }
+}
+
+//void rayCastDDA(struct Player &player)
 //{
 //  int number_current_ray    = 0;                                                       //номер текущего луча
 //  double angle_current_ray  = player.point_of_view - (player.field_of_view / 2);       //угол текущего луча
 //  double delta_between_rays = player.field_of_view / projection_plane;                 //расстояние между лучами
-//  double ray_step           = 10.0;                                                     //шаг луча за одну итерацию
+//  double ray_step           = 10.0;                                                    //шаг луча за одну итерацию
 //  double xCur_ray_pos       = player.x_position;                                       //текущая позиция луча по оси х
 //  double yCur_ray_pos       = player.y_position;                                       //текущая позиция луча по оси y
 //  double xStep;
