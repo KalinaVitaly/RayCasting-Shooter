@@ -4,6 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 LIBS += -lncurses
 
+#include sfml
+CONFIG += link_pkgconfig
+PKGCONFIG += sfml-all
 
 SOURCES += \
-        main.cpp
+        main.cpp \
+        player.cpp
+
+HEADERS += \
+    player.h
