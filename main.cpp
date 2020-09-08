@@ -33,7 +33,7 @@ int main()
       printMap(player, map);
       map.clean();
       print3D();
-      player.getInput();
+      player.getInput(map);
     }
 
   return 0;

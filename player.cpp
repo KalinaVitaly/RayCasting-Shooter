@@ -1,17 +1,30 @@
 #include "player.h"
 
-void Player::moveForward()
+void Player::moveForward(Map &map)
 {
-//  x_position += step * cos(point_of_view);
-//  y_position += step * (-sin(point_of_view));
   double stepX = step * cos(point_of_view);
   double stepY = step * (-sin(point_of_view));
 
-  //if (x_position + stepX)
-
+  if (map.getMap(floor(y_position + stepY), floor(x_position + stepX)) != 1)
+  {
+      x_position += stepX;
+      y_position += stepY;
+  }
 }
 
-void Player::getInput()
+void Player::moveBack(Map &map)
+{
+  double stepX = (-step) * cos(point_of_view);
+  double stepY = (-step) * (-sin(point_of_view));
+
+  if (map.getMap(floor(y_position + stepY), floor(x_position + stepX)) != 1)
+  {
+      x_position += stepX;
+      y_position += stepY;
+  }
+}
+
+void Player::getInput(Map &map)
 {
   struct termios oldt,
   newt;
@@ -25,14 +38,11 @@ void Player::getInput()
 
     switch (ch) {
       case 65  :  {                                                                                                   //forward
-          x_position += step * cos(point_of_view);
-          y_position += step * (-sin(point_of_view));
-          //move_forward
+          moveForward(map);
           break;
           }
       case 66  :  {                                                                                                   //back
-          x_position += (-step) * cos(point_of_view);
-          y_position += (-step) * (-sin(point_of_view));
+          moveBack(map);
           //move_back
           break;
         }

@@ -24,6 +24,7 @@ void Map::readWorldMapFromFile()
   std::ifstream file_with_maps("/home/vitaly/QtProject/RayCastingShooter/maps.txt", std::ios::in);
   int j = 0;
   int i = 0;
+
   auto convert2Int = [](char a) {
     std::stringstream s;
     int int_number;

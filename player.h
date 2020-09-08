@@ -5,15 +5,16 @@
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
+#include <map.h>
 
 class Player
 {
 public:
   Player();
 
-  void getInput();
-  void moveForward();
-  void moveBack();
+  void getInput(Map &map);
+  void moveForward(Map &map);
+  void moveBack(Map &map);
 
   double get_x_position()    const {return x_position;}
   double get_y_position()    const {return y_position;}
