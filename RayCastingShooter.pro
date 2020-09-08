@@ -10,7 +10,9 @@ PKGCONFIG += sfml-all
 
 SOURCES += \
         main.cpp \
+        map.cpp \
         player.cpp
 
 HEADERS += \
+    map.h \
     player.h

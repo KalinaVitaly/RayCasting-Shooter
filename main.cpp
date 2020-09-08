@@ -6,63 +6,32 @@
 #include <unistd.h>
 
 #include "player.h"
+#include "map.h"
 
 using namespace std;
 
-const int map_width          = 24;
-const int map_height         = 24;
 const int projection_plane_x = 240;   //видимая часть по y
 const int projection_plane_y = 80;   //видимая часть по x
 const double view_deep       = 500;   //глубина бросания лучей
 
 double distance_projection_plane[projection_plane_x];   //расстояние до припятствий
 
-int worldMap[map_height][map_width] = {               //карта мира с обозначением припятствий
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
-  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-};
-
-int c_worldMap[map_height][map_width];
-
-void printMap(const Player &player);
-void rayCast(Player &player);
+void printMap(const Player &player, Map &map);
+void rayCast(Player &player, Map &map);
 void print3D();
-
-void copyMap();
 
 int main()
 {
   Player player;
+  Map map;
+  map.readWorldMapFromFile();
 
   while (1)
     {
       system("clear");
-      rayCast(player);
-      printMap(player);
-
-      copyMap();
+      rayCast(player, map);
+      printMap(player, map);
+      map.clean();
       print3D();
       player.getInput();
     }
@@ -70,37 +39,37 @@ int main()
   return 0;
 }
 
-void printMap(const Player &player)
+void printMap(const Player &player, Map &map)
 {
   cout << "X position: " << player.get_x_position() << "   Y position: " << player.get_y_position() <<
           "   POV: " << player.get_point_of_view() << endl;
 
-  for(int i = 0; i < map_height; ++i)
+  for(int i = 0; i < map.get_height(); ++i)
     {
-      for(int j = 0; j < map_width; ++j)
+      for(int j = 0; j < map.get_width(); ++j)
         {
           if (j == static_cast<int>(player.get_x_position()) && i == static_cast<int>(player.get_y_position()))
             {
               cout << "P";
               continue;
             }
-          else if (c_worldMap[i][j] == 0)
+          else if (map.getMap(i, j) == 0)
             {
               cout << " ";
               continue;
             }
-          else if(c_worldMap[i][j] == 1)
+          else if (map.getMap(i, j) == 1)
             {
               cout << "1";
             }
-          else if (c_worldMap[i][j] == 8)
+          else if (map.getMap(i, j) == 8)
             cout << "8";
         }
       cout << "\n";
     }
 }
 
-void rayCast(Player &player)
+void rayCast(Player &player, Map &map)
 {
   double ray_step           = 0.1;
   double delta_between_rays = player.get_field_of_view() / projection_plane_x;                 //расстояние между лучами
@@ -125,7 +94,7 @@ void rayCast(Player &player)
       yStep        = ray_step * (-sin(cur_ray));
       xCur_ray_pos = player.get_x_position();
       yCur_ray_pos = player.get_y_position();
-      step = 0;
+      step         = 0;
 
       while (step <= view_deep)
         {
@@ -133,29 +102,16 @@ void rayCast(Player &player)
           yCur_ray_pos += yStep;
           ++step;
 
-          if (c_worldMap[static_cast<int>(yCur_ray_pos)][static_cast<int>(xCur_ray_pos)] == 1)
+          if (map.getMap(static_cast<int>(yCur_ray_pos), static_cast<int>(xCur_ray_pos)) == 1)
             break;
 
-          c_worldMap[static_cast<int>(yCur_ray_pos)][static_cast<int>(xCur_ray_pos)] = 8;
+          map.getMap(static_cast<int>(yCur_ray_pos), static_cast<int>(xCur_ray_pos)) = 8;
         }
 
       distance_projection_plane[number_ray_distance] = abs(xCur_ray_pos, player.get_x_position()) + abs(yCur_ray_pos, player.get_y_position());
-      //distance_projection_plane[number_ray_distance] = sqrt(pow(abs(xCur_ray_pos, player.x_position), 2) + pow(abs(yCur_ray_pos, player.y_position), 2));
       ++number_ray_distance;
     }
 }
-
-void copyMap()
-{
-  for(int i = 0; i < map_height; ++i)
-    {
-      for(int j = 0; j < map_width; ++j)
-        {
-          c_worldMap[i][j] = worldMap[i][j];
-        }
-    }
-}
-
 
 void print3D()
 {
