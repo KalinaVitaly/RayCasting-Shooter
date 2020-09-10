@@ -11,8 +11,12 @@ PKGCONFIG += sfml-all
 SOURCES += \
         main.cpp \
         map.cpp \
-        player.cpp
+        output.cpp \
+        player.cpp \
+        raycasting.cpp
 
 HEADERS += \
     map.h \
-    player.h
+    output.h \
+    player.h \
+    raycasting.h

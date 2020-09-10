@@ -16,17 +16,17 @@ public:
   void moveForward(Map &map);
   void moveBack(Map &map);
 
-  double get_x_position()    const {return x_position;}
-  double get_y_position()    const {return y_position;}
-  double get_point_of_view() const {return point_of_view;}
-  double get_field_of_view() const {return field_of_view;}
-  double get_step()          const {return step;}
+  double get_x_position()    const;
+  double get_y_position()    const;
+  double get_point_of_view() const;
+  double get_field_of_view() const;
+  double get_step()          const;
 
-  void set_x_position(double _x)       {x_position = _x;}
-  void set_y_position(double _y)       {y_position = _y;}
-  void set_point_of_view(double _view) {point_of_view = _view;}
-  void set_field_of_view(double _field){field_of_view = _field;}
-  void set_step(double _step)          {step = _step;}
+  void set_x_position(double _x);
+  void set_y_position(double _y);
+  void set_point_of_view(double _view);
+  void set_field_of_view(double _field);
+  void set_step(double _step);
 
 private:
   double x_position;            //позиция игрока по оси х

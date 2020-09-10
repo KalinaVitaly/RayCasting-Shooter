@@ -20,6 +20,6 @@ public:
 
   int get_width()          const { return c_map_width; }
   int get_height()         const { return c_map_height; }
-  int& getMap(int i, int j) {return world_map[i][j];}
+  int& getMap(int i, int j)      {return world_map[i][j];}
 };
 

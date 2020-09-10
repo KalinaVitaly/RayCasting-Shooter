@@ -1,10 +1,5 @@
 #include "map.h"
 
-Map::Map()
-{
-
-}
-
 void Map::clean()
 {
   // переделать

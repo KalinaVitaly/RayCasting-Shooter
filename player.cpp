@@ -1,5 +1,18 @@
 #include "player.h"
 
+double Player::get_x_position()    const {return x_position;}
+double Player::get_y_position()    const {return y_position;}
+double Player::get_point_of_view() const {return point_of_view;}
+double Player::get_field_of_view() const {return field_of_view;}
+double Player::get_step()          const {return step;}
+
+void Player::set_x_position(double _x)       {x_position = _x;}
+void Player::set_y_position(double _y)       {y_position = _y;}
+void Player::set_point_of_view(double _view) {point_of_view = _view;}
+void Player::set_field_of_view(double _field){field_of_view = _field;}
+void Player::set_step(double _step)          {step = _step;}
+
+
 void Player::moveForward(Map &map)
 {
   double stepX = step * cos(point_of_view);
@@ -43,7 +56,6 @@ void Player::getInput(Map &map)
           }
       case 66  :  {                                                                                                   //back
           moveBack(map);
-          //move_back
           break;
         }
       case 67  :  point_of_view += 0.2; if (point_of_view >= 2 * M_PI) point_of_view -= 2 * M_PI; break;              //right
